@@ -1,0 +1,251 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ContaFácil — Dados Bancários</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f5f7;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
+        }
+
+        .aviso {
+            background: #fff3cd;
+            color: #664d03;
+            border: 1px solid #ffecb5;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            color: #1769aa;
+            margin-bottom: 8px;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .grupo {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #1769aa;
+            box-shadow: 0 0 0 2px rgba(23,105,170,0.10);
+        }
+
+        .linha {
+            display: flex;
+            gap: 12px;
+        }
+
+        .linha .grupo {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1769aa;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background: #125789;
+        }
+
+        .resultado {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            color: #256029;
+        }
+
+        .rodape {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 450px) {
+            .linha {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="aviso">
+        ⚠️ DEMONSTRAÇÃO FICTÍCIA — NÃO É UM SITE BANCÁRIO REAL
+    </div>
+
+    <div class="logo">
+        ContaFácil
+    </div>
+
+    <p class="subtitulo">
+        Cadastro de dados bancários — Protótipo
+    </p>
+
+    <form id="formulario">
+
+        <div class="grupo">
+            <label for="titular">Nome do titular</label>
+            <input
+                type="text"
+                id="titular"
+                placeholder="Ex.: João da Silva"
+                required
+            >
+        </div>
+
+        <div class="grupo">
+            <label for="banco">Banco</label>
+            <select id="banco" required>
+                <option value="">Selecione um banco fictício</option>
+                <option>Banco Aurora</option>
+                <option>Banco Horizonte</option>
+                <option>Banco Estrela</option>
+                <option>Banco Digital Brasil</option>
+                <option>Outro</option>
+            </select>
+        </div>
+
+        <div class="linha">
+
+            <div class="grupo">
+                <label for="agencia">Agência</label>
+                <input
+                    type="text"
+                    id="agencia"
+                    placeholder="0001"
+                    maxlength="6"
+                    required
+                >
+            </div>
+
+            <div class="grupo">
+                <label for="conta">Conta</label>
+                <input
+                    type="text"
+                    id="conta"
+                    placeholder="123456-7"
+                    maxlength="12"
+                    required
+                >
+            </div>
+
+        </div>
+
+        <div class="grupo">
+            <label for="tipo">Tipo de conta</label>
+
+            <select id="tipo" required>
+                <option value="">Selecione</option>
+                <option>Conta Corrente</option>
+                <option>Conta Poupança</option>
+                <option>Conta Digital</option>
+            </select>
+        </div>
+
+        <div class="grupo">
+            <label for="pix">Chave Pix fictícia</label>
+
+            <input
+                type="text"
+                id="pix"
+                placeholder="exemplo@ficticio.com"
+            >
+        </div>
+
+        <button type="submit">
+            Cadastrar dados
+        </button>
+
+    </form>
+
+    <div class="resultado" id="resultado">
+        ✅ Dados cadastrados apenas para demonstração.
+        <br><br>
+        <strong>Nenhuma informação foi enviada para a internet.</strong>
+    </div>
+
+    <div class="rodape">
+        Protótipo educacional • Dados não armazenados
+    </div>
+
+</div>
+
+<script>
+
+    const formulario = document.getElementById("formulario");
+    const resultado = document.getElementById("resultado");
+
+    formulario.addEventListener(
+```
