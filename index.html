@@ -1,248 +1,624 @@
-```html
+```python
+from flask import Flask, request, jsonify, render_template_string
+import sqlite3
+
+app = Flask(__name__)
+
+BANCO = "demonstracao.db"
+
+
+# ==========================================================
+# BANCO DE DADOS
+# ==========================================================
+
+def criar_banco():
+    with sqlite3.connect(BANCO) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS registros (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome_teste TEXT NOT NULL,
+                banco_ficticio TEXT NOT NULL,
+                tipo_conta TEXT NOT NULL,
+                identificador_teste TEXT,
+                data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+
+# ==========================================================
+# HTML
+# ==========================================================
+
+HTML = """
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ContaFácil — Dados Bancários</title>
+<meta charset="UTF-8">
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>ContaFácil — Demonstração</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+
+    background: #f3f5f7;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+}
+
+.container {
+
+    width: 100%;
+
+    max-width: 500px;
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,0.10);
+}
+
+.aviso {
+
+    background: #fff3cd;
+
+    color: #664d03;
+
+    border: 1px solid #ffecb5;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    margin-bottom: 25px;
+}
+
+.logo {
+
+    text-align: center;
+
+    font-size: 30px;
+
+    font-weight: bold;
+
+    color: #1769aa;
+
+    margin-bottom: 8px;
+}
+
+.subtitulo {
+
+    text-align: center;
+
+    color: #666;
+
+    margin-bottom: 25px;
+}
+
+.grupo {
+
+    margin-bottom: 18px;
+}
+
+label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-weight: bold;
+
+    color: #333;
+}
+
+input,
+select {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+input:focus,
+select:focus {
+
+    border-color: #1769aa;
+
+    box-shadow:
+        0 0 0 2px rgba(23,105,170,0.10);
+}
+
+button {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #1769aa;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    margin-top: 8px;
+}
+
+button:hover {
+
+    background: #125789;
+}
+
+.resultado {
+
+    display: none;
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    background: #e8f5e9;
+
+    border-radius: 8px;
+
+    color: #256029;
+}
+
+.link {
+
+    display: block;
+
+    text-align: center;
+
+    margin-top: 20px;
+}
+
+.rodape {
+
+    text-align: center;
+
+    color: #888;
+
+    font-size: 12px;
+
+    margin-top: 20px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<div class="aviso">
+
+⚠️ DEMONSTRAÇÃO FICTÍCIA
+
+<br>
+
+NÃO É UM SITE BANCÁRIO REAL
+
+</div>
+
+
+<div class="logo">
+
+ContaFácil
+
+</div>
+
+
+<p class="subtitulo">
+
+Cadastro de dados de demonstração
+
+</p>
+
+
+<form id="formulario">
+
+
+<div class="grupo">
+
+<label for="nome">
+
+Nome de teste
+
+</label>
+
+<input
+    type="text"
+    id="nome"
+    placeholder="Ex.: João da Silva"
+    required
+>
+
+</div>
+
+
+<div class="grupo">
+
+<label for="banco">
+
+Banco fictício
+
+</label>
+
+<select id="banco" required>
+
+<option value="">
+
+Selecione
+
+</option>
+
+<option>
+
+Banco Aurora
+
+</option>
+
+<option>
+
+Banco Horizonte
+
+</option>
+
+<option>
+
+Banco Estrela
+
+</option>
+
+<option>
+
+Banco Digital Brasil
+
+</option>
+
+</select>
+
+</div>
+
+
+<div class="grupo">
+
+<label for="tipo">
+
+Tipo de conta
+
+</label>
+
+<select id="tipo" required>
+
+<option value="">
+
+Selecione
+
+</option>
+
+<option>
+
+Conta Corrente Fictícia
+
+</option>
+
+<option>
+
+Conta Poupança Fictícia
+
+</option>
+
+<option>
+
+Conta Digital Fictícia
+
+</option>
+
+</select>
+
+</div>
+
+
+<div class="grupo">
+
+<label for="identificador">
+
+Identificador de teste
+
+</label>
+
+<input
+    type="text"
+    id="identificador"
+    placeholder="TESTE-12345"
+    required
+>
+
+</div>
+
+
+<button type="submit">
+
+Enviar dados de teste
+
+</button>
+
+
+</form>
+
+
+<div
+    class="resultado"
+    id="resultado"
+></div>
+
+
+<div class="link">
+
+<a href="/registros">
+
+Ver registros de demonstração
+
+</a>
+
+</div>
+
+
+<div class="rodape">
+
+Protótipo educacional •
+Somente dados fictícios
+
+</div>
+
+
+</div>
+
+
+<script>
+
+const formulario =
+    document.getElementById("formulario");
+
+const resultado =
+    document.getElementById("resultado");
+
+
+formulario.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const dados = {
+
+            nome:
+                document.getElementById(
+                    "nome"
+                ).value,
+
+            banco:
+                document.getElementById(
+                    "banco"
+                ).value,
+
+            tipo:
+                document.getElementById(
+                    "tipo"
+                ).value,
+
+            identificador:
+                document.getElementById(
+                    "identificador"
+                ).value
+
+        };
+
+
+        try {
+
+            const resposta =
+                await fetch(
+                    "/receber",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(dados)
+                    }
+                );
+
+
+            const resultadoServidor =
+                await resposta.json();
+
+
+            resultado.innerHTML =
+                "✅ " +
+                resultadoServidor.mensagem;
+
+
+            resultado.style.display =
+                "block";
+
+
+            formulario.reset();
+
+
+        } catch (erro) {
+
+            resultado.innerHTML =
+                "❌ Não foi possível enviar os dados.";
+
+            resultado.style.display =
+                "block";
         }
 
-        body {
-            background: #f3f5f7;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    }
+);
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
-        }
+</script>
 
-        .aviso {
-            background: #fff3cd;
-            color: #664d03;
-            border: 1px solid #ffecb5;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 25px;
-        }
 
-        .logo {
-            text-align: center;
-            font-size: 30px;
-            font-weight: bold;
-            color: #1769aa;
-            margin-bottom: 8px;
-        }
+</body>
 
-        .subtitulo {
-            text-align: center;
-            color: #666;
-            margin-bottom: 25px;
-        }
+</html>
+"""
 
-        .grupo {
-            margin-bottom: 18px;
-        }
 
-        label {
-            display: block;
-            margin-bottom: 7px;
-            font-weight: bold;
-            color: #333;
-        }
+# ==========================================================
+# PÁGINA DE REGISTROS
+# ==========================================================
 
-        input,
-        select {
-            width: 100%;
-            padding: 13px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-        }
+REGISTROS_HTML = """
 
-        input:focus,
-        select:focus {
-            border-color: #1769aa;
-            box-shadow: 0 0 0 2px rgba(23,105,170,0.10);
-        }
+<!DOCTYPE html>
 
-        .linha {
-            display: flex;
-            gap: 12px;
-        }
+<html lang="pt-BR">
 
-        .linha .grupo {
-            flex: 1;
-        }
+<head>
 
-        button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            background: #1769aa;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 8px;
-        }
+<meta charset="UTF-8">
 
-        button:hover {
-            background: #125789;
-        }
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-        .resultado {
-            display: none;
-            margin-top: 20px;
-            padding: 15px;
-            background: #e8f5e9;
-            border-radius: 8px;
-            color: #256029;
-        }
+<title>Registros</title>
 
-        .rodape {
-            text-align: center;
-            color: #888;
-            font-size: 12px;
-            margin-top: 20px;
-        }
+<style>
 
-        @media (max-width: 450px) {
-            .linha {
-                flex-direction: column;
-                gap: 0;
-            }
-        }
-    </style>
+body {
+
+    font-family: Arial;
+
+    background: #f3f5f7;
+
+    padding: 30px;
+}
+
+.container {
+
+    max-width: 1100px;
+
+    margin: auto;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 15px;
+}
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 20px;
+}
+
+th,
+td {
+
+    border: 1px solid #ddd;
+
+    padding: 10px;
+
+    text-align: left;
+}
+
+th {
+
+    background: #1769aa;
+
+    color: white;
+}
+
+tr:nth-child(even) {
+
+    background: #f5f5f5;
+}
+
+a {
+
+    display: inline-block;
+
+    margin-top: 20px;
+
+    color: #1769aa;
+
+    text-decoration: none;
+}
+
+</style>
+
 </head>
 
 <body>
 
+
 <div class="container">
 
-    <div class="aviso">
-        ⚠️ DEMONSTRAÇÃO FICTÍCIA — NÃO É UM SITE BANCÁRIO REAL
-    </div>
-
-    <div class="logo">
-        ContaFácil
-    </div>
-
-    <p class="subtitulo">
-        Cadastro de dados bancários — Protótipo
-    </p>
-
-    <form id="formulario">
-
-        <div class="grupo">
-            <label for="titular">Nome do titular</label>
-            <input
-                type="text"
-                id="titular"
-                placeholder="Ex.: João da Silva"
-                required
-            >
-        </div>
-
-        <div class="grupo">
-            <label for="banco">Banco</label>
-            <select id="banco" required>
-                <option value="">Selecione um banco fictício</option>
-                <option>Banco Aurora</option>
-                <option>Banco Horizonte</option>
-                <option>Banco Estrela</option>
-                <option>Banco Digital Brasil</option>
-                <option>Outro</option>
-            </select>
-        </div>
-
-        <div class="linha">
-
-            <div class="grupo">
-                <label for="agencia">Agência</label>
-                <input
-                    type="text"
-                    id="agencia"
-                    placeholder="0001"
-                    maxlength="6"
-                    required
-                >
-            </div>
-
-            <div class="grupo">
-                <label for="conta">Conta</label>
-                <input
-                    type="text"
-                    id="conta"
-                    placeholder="123456-7"
-                    maxlength="12"
-                    required
-                >
-            </div>
-
-        </div>
-
-        <div class="grupo">
-            <label for="tipo">Tipo de conta</label>
-
-            <select id="tipo" required>
-                <option value="">Selecione</option>
-                <option>Conta Corrente</option>
-                <option>Conta Poupança</option>
-                <option>Conta Digital</option>
-            </select>
-        </div>
-
-        <div class="grupo">
-            <label for="pix">Chave Pix fictícia</label>
-
-            <input
-                type="text"
-                id="pix"
-                placeholder="exemplo@ficticio.com"
-            >
-        </div>
-
-        <button type="submit">
-            Cadastrar dados
-        </button>
-
-    </form>
-
-    <div class="resultado" id="resultado">
-        ✅ Dados cadastrados apenas para demonstração.
-        <br><br>
-        <strong>Nenhuma informação foi enviada para a internet.</strong>
-    </div>
-
-    <div class="rodape">
-        Protótipo educacional • Dados não armazenados
-    </div>
-
-</div>
-
-<script>
+<h1>Registros de demons
+```
 
     const formulario = document.getElementById("formulario");
     const resultado = document.getElementById("resultado");
